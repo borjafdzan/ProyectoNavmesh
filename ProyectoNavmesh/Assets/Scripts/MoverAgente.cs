@@ -6,6 +6,8 @@ using UnityEngine;
 public class MoverAgente : MonoBehaviour
 {
     public Transform[] posicionesMoverse;
+    public bool espera = true;
+    public float tiempoEspera = 0.5f;
     private NavMeshAgent agente;
     private int indicePatrulla;
     // Start is called before the first frame update
@@ -26,22 +28,39 @@ public class MoverAgente : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (AlcanzoDestino()){
+        if (AlcanzoDestino())
+        {
             SiguientePosicion();
         }
     }
-    private bool AlcanzoDestino(){
-        if (Vector3.Distance(this.transform.position, posicionesMoverse[indicePatrulla].position) < 0.2f){
+    private bool AlcanzoDestino()
+    {
+        if (Vector3.Distance(this.transform.position, posicionesMoverse[indicePatrulla].position) < 0.2f)
+        {
             Debug.Log("Llego al destino");
             return true;
         }
         return false;
     }
-    private void SiguientePosicion(){
+    private void SiguientePosicion()
+    {
         this.indicePatrulla++;
-        if (indicePatrulla >= this.posicionesMoverse.Length){
+        if (indicePatrulla >= this.posicionesMoverse.Length)
+        {
             this.indicePatrulla = 0;
         }
+        if (espera)
+        {
+            Invoke("DejarEsperar", tiempoEspera);
+        }
+        else
+        {
+            this.agente.destination = posicionesMoverse[indicePatrulla].position;
+        }
+    }
+
+    private void DejarEsperar()
+    {
         this.agente.destination = posicionesMoverse[indicePatrulla].position;
     }
 }
