@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
 
@@ -10,7 +8,8 @@ public class MoverAgente : MonoBehaviour
     public float tiempoEspera = 0.5f;
     private NavMeshAgent agente;
     private int indicePatrulla;
-    // Start is called before the first frame update
+    private bool isInDestino = false;
+
     void Start()
     {
         this.agente = GetComponent<NavMeshAgent>();
@@ -25,12 +24,14 @@ public class MoverAgente : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (AlcanzoDestino())
+        if (!isInDestino)
         {
-            SiguientePosicion();
+            if (AlcanzoDestino())
+            {
+                SiguientePosicion();
+            }
         }
     }
     private bool AlcanzoDestino()
@@ -47,7 +48,7 @@ public class MoverAgente : MonoBehaviour
         this.indicePatrulla++;
         if (indicePatrulla >= this.posicionesMoverse.Length)
         {
-            this.indicePatrulla = 0;
+            isInDestino = true;
         }
         if (espera)
         {
@@ -61,6 +62,8 @@ public class MoverAgente : MonoBehaviour
 
     private void DejarEsperar()
     {
-        this.agente.destination = posicionesMoverse[indicePatrulla].position;
+        if (!isInDestino){
+            this.agente.destination = posicionesMoverse[indicePatrulla].position;
+        }
     }
 }
