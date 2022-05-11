@@ -62,7 +62,8 @@ public class MoverAgente : MonoBehaviour
 
     private void DejarEsperar()
     {
-        if (!isInDestino){
+        if (!isInDestino)
+        {
             this.agente.destination = posicionesMoverse[indicePatrulla].position;
         }
     }
