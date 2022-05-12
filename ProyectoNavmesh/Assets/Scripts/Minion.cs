@@ -11,11 +11,24 @@ public class Minion : MonoBehaviour
     void Start()
     {
         this.agenteNavegacion = GetComponent<NavMeshAgent>();
+        StartCoroutine(CorrutinaSeguir());
     }
 
     // Update is called once per frame
     void Update()
     {
-        this.agenteNavegacion.destination = this.Jugador.transform.position;
+        if (agenteNavegacion.isOnOffMeshLink){
+            OffMeshLinkData link = agenteNavegacion.currentOffMeshLinkData;
+            transform.position = link.endPos;
+        }
+    }
+
+    IEnumerator CorrutinaSeguir()
+    {
+        while (true)
+        {
+            this.agenteNavegacion.destination = this.Jugador.transform.position;
+            yield return new WaitForSeconds(0.3f);
+        }
     }
 }
