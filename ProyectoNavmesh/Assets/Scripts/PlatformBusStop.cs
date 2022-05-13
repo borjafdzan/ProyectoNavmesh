@@ -25,6 +25,7 @@ public class PlatformBusStop : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space)){
             activo = !activo;
+            this.transform.position = posicionInicial.position;
         }
         if (activo)
         {
