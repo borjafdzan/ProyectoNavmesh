@@ -18,7 +18,7 @@ public class Minion : MonoBehaviour
     void Start()
     {
         this.agenteNavegacion = GetComponent<NavMeshAgent>();
-        
+
         agenteNavegacion.destination = Jugador.transform.position;
         this.renderizador.material.SetColor("__Color", colorActivo);
     }
@@ -27,16 +27,45 @@ public class Minion : MonoBehaviour
     void Update()
     {
         RaycastHit[] JugadoresEnObjetivo = Physics.SphereCastAll(this.transform.position, 10, this.transform.forward, 10, mascaraJugador);
-            if (JugadoresEnObjetivo.Length > 0)
+        if (JugadoresEnObjetivo.Length > 0 )
+        {
+            if (EstaEnVision(JugadoresEnObjetivo[0].transform.gameObject))
             {
                 this.agenteNavegacion.destination = Jugador.transform.position;
             }
-            else
-            {
-                this.agenteNavegacion.destination = Casa.position;
-                this.renderizador.material.SetColor("__Color", colorDesactivo);
-            }
+        }
+        else
+        {
+            this.agenteNavegacion.destination = Casa.position;
+            this.renderizador.material.SetColor("__Color", colorDesactivo);
+        }
     }
 
-    
+    //Este metodo comprueba si esta en vision
+    private bool EstaEnVision(GameObject objetivoDetectado)
+    {
+        Vector3 direccion = this.transform.position - objetivoDetectado.transform.position;
+        direccion = direccion.normalized;
+        direccion = -direccion;
+        //Subimos la posicion del raycast
+        RaycastHit[] objetivos = Physics.RaycastAll(this.transform.position + Vector3.up, direccion, 10, -1);
+        Debug.Log("Se hizo el racast se encontraron" + objetivos.Length);
+        //En el caso de que el primer objeto que vea el raycast del minion sea el jugador
+        //devolvemos verdadero si el raycast coje otro es falso;
+        foreach (RaycastHit golpe in objetivos)
+        {
+            Debug.Log(golpe.transform.gameObject.tag);
+            
+            if (golpe.transform.gameObject.tag == "Player")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
