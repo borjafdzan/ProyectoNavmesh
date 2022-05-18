@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
 
+public enum EstadoMinion
+{
+    Idle,
+    Perseguir
+}
 public class Minion : MonoBehaviour
 {
     public GameObject Jugador;
@@ -11,6 +16,7 @@ public class Minion : MonoBehaviour
     public float anguloLimite = 40;
     private Color colorActivo = Color.red;
     private Color colorDesactivo = Color.green;
+    private EstadoMinion estadoActual;
     public Renderer renderizador;
     NavMeshAgent agenteNavegacion;
 
@@ -22,26 +28,41 @@ public class Minion : MonoBehaviour
 
         agenteNavegacion.destination = Jugador.transform.position;
         this.renderizador.material.SetColor("__Color", colorActivo);
+        ComprobarEstado();
     }
 
     // Update is called once per frame
     void Update()
+    {
+        ComprobarEstado();
+        if (estadoActual == EstadoMinion.Idle)
+        {
+            this.agenteNavegacion.destination = Casa.position;
+        }
+        else if (estadoActual == EstadoMinion.Perseguir)
+        {
+            this.agenteNavegacion.destination = Jugador.transform.position;
+        }
+    }
+
+    private void ComprobarEstado()
     {
         RaycastHit[] JugadoresEnObjetivo = Physics.SphereCastAll(this.transform.position, 10, this.transform.forward, 10, mascaraJugador);
         if (JugadoresEnObjetivo.Length > 0)
         {
             if (EstaEnVision(JugadoresEnObjetivo[0].transform.gameObject))
             {
-                this.agenteNavegacion.destination = Jugador.transform.position;
+                estadoActual = EstadoMinion.Perseguir;
+                return;
             }
         }
         else
         {
-            this.agenteNavegacion.destination = Casa.position;
-            this.renderizador.material.SetColor("__Color", colorDesactivo);
+            estadoActual = EstadoMinion.Idle;
+            return;
         }
+        estadoActual = EstadoMinion.Idle;
     }
-
     //Este metodo comprueba si esta en vision
     private bool EstaEnVision(GameObject objetivoDetectado)
     {
@@ -59,7 +80,7 @@ public class Minion : MonoBehaviour
 
             if (golpe.transform.gameObject.tag == "Player" && EstaEnRango(golpe.transform.gameObject))
             {
-                
+
                 return true;
             }
             else
