@@ -8,6 +8,7 @@ public class Minion : MonoBehaviour
     public GameObject Jugador;
     public Transform Casa;
     public LayerMask mascaraJugador;
+    public float anguloLimite = 40;
     private Color colorActivo = Color.red;
     private Color colorDesactivo = Color.green;
     public Renderer renderizador;
@@ -27,7 +28,7 @@ public class Minion : MonoBehaviour
     void Update()
     {
         RaycastHit[] JugadoresEnObjetivo = Physics.SphereCastAll(this.transform.position, 10, this.transform.forward, 10, mascaraJugador);
-        if (JugadoresEnObjetivo.Length > 0 )
+        if (JugadoresEnObjetivo.Length > 0)
         {
             if (EstaEnVision(JugadoresEnObjetivo[0].transform.gameObject))
             {
@@ -55,9 +56,10 @@ public class Minion : MonoBehaviour
         foreach (RaycastHit golpe in objetivos)
         {
             Debug.Log(golpe.transform.gameObject.tag);
-            
-            if (golpe.transform.gameObject.tag == "Player")
+
+            if (golpe.transform.gameObject.tag == "Player" && EstaEnRango(golpe.transform.gameObject))
             {
+                
                 return true;
             }
             else
@@ -65,7 +67,25 @@ public class Minion : MonoBehaviour
                 return false;
             }
         }
-        return true;
+        return false;
+    }
+
+    private bool EstaEnRango(GameObject objetivoDetectado)
+    {
+        Vector3 direccion = this.transform.position - objetivoDetectado.transform.position;
+        direccion = direccion.normalized;
+        direccion = -direccion;
+        //Cogemos el angulo entre el vector frente del jugador y el objetivo
+        float angulo = Vector3.Angle(this.transform.forward, direccion);
+        Debug.Log(angulo);
+        if (angulo <= anguloLimite)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 }
